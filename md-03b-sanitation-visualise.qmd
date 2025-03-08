@@ -1,7 +1,7 @@
 ---
 title: "Data transformation with dplyr"
 subtitle: "And make a plot"
-author: ""
+author: "Nuaim"
 format:
   html:
     embed-resources: true
@@ -47,7 +47,8 @@ sanitation <- read_csv("data/jmp_wld_sanitation_long.csv")
 3.  How many variables are in the data set?
 
 ```{r}
-
+glimpse(sanitation)
+"8 variabels in the dataset"
 ```
 
 ## Task 2
@@ -55,7 +56,8 @@ sanitation <- read_csv("data/jmp_wld_sanitation_long.csv")
 1.  Use the `count()` function with varname_short and varname_long to identify the definitions of the levels in these two variables.
 
 ```{r}
-
+sanitation %>%
+  count(varname_short, varname_long)
 ```
 
 ## Task 3
@@ -69,7 +71,10 @@ sanitation <- read_csv("data/jmp_wld_sanitation_long.csv")
 2.  Store the result as a new object in your environment with a name of your choice.
 
 ```{r}
-
+sanitation_per <- sanitation %>%  
+  filter(iso3 == "PER",
+         year %in% c(2000, 2020), 
+         varname_short != "san_sm")
 ```
 
 ## Task 4
@@ -77,7 +82,8 @@ sanitation <- read_csv("data/jmp_wld_sanitation_long.csv")
 1.  Use the `count()` function with the data you created in Task 3 to verify that year 2000 and 2020 remained in the year variable.
 
 ```{r}
-
+sanitation_per %>% 
+  count(year)
 ```
 
 ## Task 5
@@ -100,16 +106,26 @@ geom_text(aes(label = round(percent, 1)),
 ```
 
 ```{r}
-
+ggplot(data = sanitation_per,
+       mapping = aes(x = residence, 
+                     y = percent, 
+                     fill = varname_long)) +
+  geom_col() +
+  facet_wrap(~year) +
+  scale_fill_colorblind() +
+  geom_text(aes(label = round(percent, 1)), 
+            position = position_stack(vjust = 0.5),
+            size = 3,
+            color = "white") 
 ```
 
 ## Task 6
 
 If you haven't worked with JMP indicators before, the following questions will be challenging to answer.
 
-1.  Look at the plot that you created. What do you notice about the order of the bars / order of the legend?
-2.  What would you want to change?
-3.  Why did we remove "safely managed sanitation services" from the data set in Task 3?
+1.  Look at the plot that you created. What do you notice about the order of the bars / order of the legend? they are ordered by the level of sanitation. top being best sanitation level
+2.  What would you want to change? probably the colors of the plot for my own pleasing.
+3.  Why did we remove "safely managed sanitation services" from the data set in Task 3? I haven't checked but based on the plot I believe there is not much info about that level of sanitation or we want to better highlight the disparaties in the lower level of sanitations
 
 ## Task 7
 
@@ -127,6 +143,8 @@ ggplot(data = sanitation_2020,
   facet_grid(varname_short ~ residence, scales = "free_y") +
   scale_fill_colorblind() +
   theme(legend.position = "none") 
+
+"data from 2020 in a plot in plot format shows the amount as well"
 
 ```
 
